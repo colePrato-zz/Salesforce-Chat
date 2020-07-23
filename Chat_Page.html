@@ -1,1 +1,178 @@
+<html>
+<body>
 
+<input id = "btnSubmit" type="submit" value="Chat with Support"/> 
+
+  <style type='text/css'>
+    .embeddedServiceHelpButton .helpButton .uiButton {
+        background-color: #EEA236;
+        font-family: "Arial", sans-serif;
+    }
+    .embeddedServiceHelpButton .helpButton .uiButton:focus {
+        outline: 1px solid #EEA236;
+    }
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
+<script type='text/javascript'>
+
+var firstName = "ShopTech";
+var lastName = "Test User";
+var emailAddress = "TestUser1@shoptech.com";
+var pinCode = "1307";
+var today = new Date().toLocaleString();
+var subject = "SHOP Hosted";
+
+$("#btnSubmit").click(function(){
+    $('.helpButtonEnabled').trigger("click");
+});
+
+
+    var initESW = function(gslbBaseURL) {
+        embedded_svc.settings.displayHelpButton = true; //Or false
+        embedded_svc.settings.language = ''; //For example, enter 'en' or 'en-US'
+
+        embedded_svc.settings.defaultMinimizedText = 'Chat with Support'; //(Defaults to Chat with an Expert)
+        embedded_svc.settings.disabledMinimizedText = 'Agents Offline'; //(Defaults to Agent Offline)
+
+        //embedded_svc.settings.loadingText = ''; //(Defaults to Loading)
+        //embedded_svc.settings.storageDomain = 'shoptech.com'; //(Sets the domain for your deployment so that visitors can navigate subdomains during a chat session)
+
+        // Settings for Chat
+        //embedded_svc.settings.directToButtonRouting = function(prechatFormData) {
+            // Dynamically changes the button ID based on what the visitor enters in the pre-chat form.
+            // Returns a valid button ID.
+        //};
+        //embedded_svc.settings.prepopulatedPrechatFields = {}; //Sets the auto-population of pre-chat form fields
+        //embedded_svc.settings.fallbackRouting = []; //An array of button IDs, user IDs, or userId_buttonId
+        //embedded_svc.settings.offlineSupportMinimizedText = '...'; //(Defaults to Contact Us)
+
+         embedded_svc.settings.extraPrechatFormDetails = [{
+        "label":"First Name",
+        "name":"FirstName",
+        "value": firstName,
+        "displayToAgent":false
+    }, {
+        "label":"Last Name",
+        "value":lastName,
+        "displayToAgent":false
+    }, {
+        "label":"Full Name",
+        "value":firstName + " " + lastName,
+        "displayToAgent":true
+    },  {
+        "label":"Email",
+        "value": emailAddress,
+        "displayToAgent":true
+    }, {
+        "label":"Subject",
+        "value": subject+" Chat Started at  "+today,
+        "displayToAgent":false
+    }, {
+        "label":"Origin",
+        "value":"SHOP Chat",
+        "displayToAgent":true
+    }, {"label":"Pin Code",
+         "value": pinCode,
+         "transcriptFields": ["Pin_Code__c"],
+         "displayToAgent":false
+         }]; 
+    
+    embedded_svc.settings.extraPrechatInfo = [{
+        "entityName":"Contact",
+        "showOnCreate":true,
+        "linkToEntityName":"Case",
+        "linkToEntityField":"ContactId",
+        "saveToTranscript":"ContactId",
+        "entityFieldMaps": [{
+            "isExactMatch":true,
+            "fieldName":"FirstName",
+            "doCreate":true,
+            "doFind":true,
+            "label":"First Name"
+        }, {
+            "isExactMatch":true,
+            "fieldName":"LastName",
+            "doCreate":true,
+            "doFind":true,
+            "label":"Last Name"
+        }, {
+            "isExactMatch":true,
+            "fieldName":"Email",
+            "doCreate":true,
+            "doFind":true,
+            "label":"Email"
+        }]
+    }, {
+        "entityName":"Case",
+        "showOnCreate":true,
+        "saveToTranscript":"CaseId",
+        "entityFieldMaps": [{
+            "isExactMatch":false,
+            "fieldName":"Subject",
+            "doCreate":true,
+            "doFind":false,
+            "label":"Subject"
+          },{
+            "isExactMatch":false,
+            "fieldName":"Origin",
+            "doCreate":true,
+            "doFind":false,
+            "label":"Origin"
+          },{
+            "isExactMatch":false,
+            "fieldName":"Status",
+            "doCreate":true,
+            "doFind":false,
+            "label":"Status"
+          },{
+            "isExactMatch":false,
+            "fieldName":"SuppliedEmail",
+            "doCreate":true,
+            "doFind":false,
+            "label":"Email"
+          },{
+            "isExactMatch":false,
+            "fieldName":"SuppliedName",
+            "doCreate":true,
+            "doFind":false,
+            "label": "Full Name"
+          }]
+    }];  
+         
+         
+        embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+        embedded_svc.settings.entryFeature = 'LiveAgent';
+
+        embedded_svc.init(
+            'https://shoptech.my.salesforce.com',
+            'https://shoptechchat.secure.force.com',
+            gslbBaseURL,
+            '00Dd0000000gYq7',
+            'Chat_SHOP_Inside_SHOP_HOSTED',
+            {
+                baseLiveAgentContentURL: 'https://c.la3-c2-phx.salesforceliveagent.com/content',
+                deploymentId: '5720W000000wk6V',
+                buttonId: '5730W000001UJD3',
+                baseLiveAgentURL: 'https://d.la3-c2-phx.salesforceliveagent.com/chat',
+                eswLiveAgentDevName: 'EmbeddedServiceLiveAgent_Parent04I0W000000XZAMUA4_1737cceea6e',
+                isOfflineSupportEnabled: false
+            }
+        );
+    };
+
+    if (!window.embedded_svc) {
+        var s = document.createElement('script');
+        s.setAttribute('src', 'https://shoptech.my.salesforce.com/embeddedservice/5.0/esw.min.js');
+        s.onload = function() {
+            initESW(null);
+        };
+        document.body.appendChild(s);
+    } else {
+        initESW('https://service.force.com');
+    }
+</script>
+
+</body>
+</html>
